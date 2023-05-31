@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+import pytest
 import json
 import datetime
 from rest_framework import status
@@ -14,7 +15,8 @@ from .serializers import BlogSerializer
 
 
 # Create your tests here.
-@permission_classes([IsAuthenticated])
+@pytest.mark.django_db
+# @permission_classes([IsAuthenticated])
 class BlogTest(APITestCase):
     def setUp(self):
         self.topic1 = Topics.objects.create(Author='alex1', TopicName='Hello', DateOfPublish=datetime.date(2023, 5, 16), Contact='1234567890')
@@ -23,14 +25,16 @@ class BlogTest(APITestCase):
         print(self.topic1.DateOfPublish)
     def test_can_create_blog(self):
 
-        url = reverse(views.blogCreate)
+        url = reverse('blogCreate')
         data = {
             'blogName': 'Test Blog',
             'topics': [self.topic1.id, self.topic2.id]
         }
         serializer = BlogSerializer(data, many=True)
         response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)# create testcase but not good
+        # self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)# create testcase but not good
+        # response = api_client_auth.post(url, data=data)
+        assert response.status_code == 200
 
     def test_can_update_blog(self):
         blog = Blog.objects.create(

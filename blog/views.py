@@ -13,7 +13,9 @@ from .models import  Blog
 from .serializers import BlogSerializer
 from topic1.models import Topics
 
+import logging
 
+logger = logging.getLogger('django')
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -55,6 +57,13 @@ def blogUpdate(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get(request):
+    """
+    List all topics
+    """
+    logger.info("Platform is running FINE")
+    logger.warning("Platform is running at risk")
+    logger.debug("Platform is running at risk")
+    logger.error("Error Platform is running at risk")
     blogs = Blog.objects.all()
     blogSerializer = BlogSerializer(blogs, many=True) # many=True means 
     return JsonResponse(blogSerializer.data, safe=False)

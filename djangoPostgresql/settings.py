@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,8 +46,8 @@ INSTALLED_APPS = [
     'interest.apps.InterestConfig',
     'city.apps.CityConfig',
     'personalAddress.apps.PersonaladdressConfig',
-    # 'topic1.apps.Topic1Config',
-    # 'blog.apps.BlogConfig',
+    'topic1.apps.Topic1Config',
+    'blog.apps.BlogConfig',
     
 ]
 
@@ -75,6 +76,63 @@ DATABASES = {
     }
 }
 
+LOG_LEVEL = logging.DEBUG
+
+LOG_HANDLERS = [
+    {
+        'type': 'console',
+        'level': LOG_LEVEL,
+        'formatter': 'verbose',
+    },
+    {
+        'type': 'file',
+        'level': LOG_LEVEL,
+        'formatter': 'verbose',
+        'filename': 'logs/app.log',
+    },
+]
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{levelname}] {asctime} {module} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'D',
+            'interval': 1,
+            'backupCount': 3,
+            'encoding': 'utf8',
+            'filename': 'logs/log.log',
+            'formatter': 'simple'
+        }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True, # log http request False
+        },
+    },
+}
+LOG_VIEWER_FILES = ['info']
+LOG_VIEWER_FILES_PATTERN = '*.log*'
+LOG_VIEWER_FILES_DIR = 'logs/'
+LOG_VIEWER_PAGE_LENGTH = 25       # total log lines per-page
+LOG_VIEWER_MAX_READ_LINES = 1000  # total log lines will be read
+LOG_VIEWER_FILE_LIST_MAX_ITEMS_PER_PAGE = 25 # Max log files loaded in Datatable per page
+LOG_VIEWER_PATTERNS = ['[INFO]', '[WARNING]', '[ERROR]', '[CRITICAL]']
+LOG_VIEWER_EXCLUDE_TEXT_PATTERN = None  # String regex expression to exclude the log from line
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -88,58 +146,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'djangoPostgresql.urls'
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "filters": {
-        "special": {
-            "()": "project.logging.SpecialFilter",
-            "foo": "bar",
-        },
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "INFO",
-            "filters": ["require_debug_true"],
-            "class": "logging.StreamHandler",
-            "formatter": "simple",
-        },
-        "mail_admins": {
-            "level": "ERROR",
-            "class": "django.utils.log.AdminEmailHandler",
-            "filters": ["special"],
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "propagate": True,
-        },
-        "django.request": {
-            "handlers": ["mail_admins"],
-            "level": "ERROR",
-            "propagate": False,
-        },
-        "myproject.custom": {
-            "handlers": ["console", "mail_admins"],
-            "level": "INFO",
-            "filters": ["special"],
-        },
-    },
-}
 
 TEMPLATES = [
     {
